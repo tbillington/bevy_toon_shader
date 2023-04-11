@@ -23,5 +23,6 @@ fn fragment (in: FragmentInput) -> @location(0) vec4<f32> {
     if n_dot_l > 0.0 {
         intensity = 1.0;
     }
-    return base_color * intensity;
+    let ambient_color = vec4<f32>(0.4, 0.4, 0.4, 1.0);
+    return base_color * (intensity + ambient_color);
 }
