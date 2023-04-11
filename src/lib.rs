@@ -37,6 +37,7 @@ impl Plugin for ToonShaderPlugin {
 pub struct ToonShaderMaterial {
     pub color: Color,
     pub sun_pos: Vec3,
+    pub sun_color: Color,
     #[texture(1)]
     #[sampler(2)]
     pub base_color_texture: Option<Handle<Image>>,
@@ -65,6 +66,7 @@ impl AsBindGroupShaderType<ToonShaderMaterialUniform> for ToonShaderMaterial {
         ToonShaderMaterialUniform {
             color: self.color.into(),
             sun_pos: self.sun_pos,
+            sun_color: self.sun_color.into(),
         }
     }
 }
@@ -73,6 +75,7 @@ impl AsBindGroupShaderType<ToonShaderMaterialUniform> for ToonShaderMaterial {
 pub struct ToonShaderMaterialUniform {
     pub color: Vec4,
     pub sun_pos: Vec3,
+    pub sun_color: Vec4,
 }
 
 #[derive(Eq, PartialEq, Hash, Clone)]
