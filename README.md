@@ -1,6 +1,6 @@
 # Bevy Toon Shader
 
-A [toon shader](https://en.wikipedia.org/wiki/Cel_shading) for 3d objects in the [Bevy](https://github.com/bevyengine/bevy/) game engine.
+A [toon shader](https://en.wikipedia.org/wiki/Cel_shading) for the [Bevy](https://github.com/bevyengine/bevy/) game engine.
 
 <img width="1234" alt="bevy_toon_shader" src="https://user-images.githubusercontent.com/2771466/233092241-71a0f13a-fc0a-4022-913c-ddc3658d7f48.png">
 
