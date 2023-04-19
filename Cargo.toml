@@ -2,6 +2,13 @@
 name = "bevy_toon_shader"
 version = "0.1.0"
 edition = "2021"
+categories = ["game-engines", "graphics", "rendering", "game-development"]
+keywords = ["gamedev", "graphics", "bevy", "shader", "toon"]
+license = "MIT OR Apache-2.0"
+readme = "README.md"
+description = "Toon shader for the Bevy game engine"
+repository = "https://github.com/tbillington/bevy_toon_shader"
+homepage = "https://github.com/tbillington/bevy_toon_shader"
 
 [dependencies]
 bevy = { version = "0.10", default-features = false, features = [

@@ -1,5 +1,8 @@
 # Bevy Toon Shader
 
+[![Crates.io](https://img.shields.io/crates/v/bevy_toon_shader)](https://crates.io/crates/bevy_toon_shader)
+[![MIT/Apache 2.0](https://img.shields.io/badge/license-MIT%2FApache-blue.svg)](https://github.com/tbillington/bevy_toon_shader#license)
+
 A [toon shader](https://en.wikipedia.org/wiki/Cel_shading) for the [Bevy](https://github.com/bevyengine/bevy/) game engine.
 
 <img width="1234" alt="bevy_toon_shader" src="https://user-images.githubusercontent.com/2771466/233092241-71a0f13a-fc0a-4022-913c-ddc3658d7f48.png">
@@ -93,7 +96,6 @@ cargo run --example scene
 ## Credit
 
 Code initially adapted from this [excellent Unity tutorial](https://roystan.net/articles/toon-shader/) by Roystan.
-
 
 ## License
 
