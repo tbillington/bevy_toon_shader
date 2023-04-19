@@ -11,3 +11,7 @@ bevy = { version = "0.10.1", default-features = false, features = [
   "bevy_render",
   "bevy_asset",
 ] }
+
+[dev-dependencies]
+bevy = { version = "0.10.1" }
+bevy_egui = "0.20.2"
