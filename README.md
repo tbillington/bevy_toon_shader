@@ -1,5 +1,7 @@
 # Bevy Toon Shader
 
+<img width="1234" alt="bevy_toon_shader" src="https://user-images.githubusercontent.com/2771466/233092241-71a0f13a-fc0a-4022-913c-ddc3658d7f48.png">
+
 **Features**
 - "Sun" color & direction
 - Specular highlight
@@ -11,8 +13,6 @@
 - Dynamic color banding amount
 - Shadow receiving
 - Rim lighting
-
-<img width="1234" alt="bevy_toon_shader" src="https://user-images.githubusercontent.com/2771466/233092241-71a0f13a-fc0a-4022-913c-ddc3658d7f48.png">
 
 ## Installation
 
