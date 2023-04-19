@@ -3,15 +3,13 @@ name = "bevy_toon_shader"
 version = "0.1.0"
 edition = "2021"
 
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
-
 [dependencies]
-bevy = { version = "0.10.1", default-features = false, features = [
+bevy = { version = "0.10", default-features = false, features = [
   "bevy_pbr",
   "bevy_render",
   "bevy_asset",
 ] }
 
 [dev-dependencies]
-bevy = { version = "0.10.1" }
+bevy = { version = "0.10" }
 bevy_egui = "0.20.2"

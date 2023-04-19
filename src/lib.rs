@@ -26,18 +26,16 @@ impl Plugin for ToonShaderPlugin {
             Shader::from_wgsl
         );
 
-        app.add_plugin(MaterialPlugin::<ToonShaderMaterial>::default());
-        app.add_system(update_toon_shader);
+        app.add_plugin(MaterialPlugin::<ToonShaderMaterial>::default())
+            .add_system(update_toon_shader);
     }
 }
 
 #[derive(AsBindGroup, TypeUuid, Debug, Clone)]
 #[uuid = "7b033895-875f-4cb5-97ae-8601fcc37053"]
-// #[bind_group_data(ToonShaderMaterialKey)]
 #[uniform(0, ToonShaderMaterialUniform)]
 pub struct ToonShaderMaterial {
     pub color: Color,
-    pub sun_pos: Vec3,
     pub sun_dir: Vec3,
     pub sun_color: Color,
     pub camera_pos: Vec3,
@@ -69,7 +67,6 @@ impl AsBindGroupShaderType<ToonShaderMaterialUniform> for ToonShaderMaterial {
     ) -> ToonShaderMaterialUniform {
         ToonShaderMaterialUniform {
             color: self.color.into(),
-            sun_pos: self.sun_pos,
             sun_dir: self.sun_dir,
             sun_color: self.sun_color.into(),
             camera_pos: self.camera_pos,
@@ -81,7 +78,6 @@ impl AsBindGroupShaderType<ToonShaderMaterialUniform> for ToonShaderMaterial {
 #[derive(Clone, Default, ShaderType)]
 pub struct ToonShaderMaterialUniform {
     pub color: Vec4,
-    pub sun_pos: Vec3,
     pub sun_dir: Vec3,
     pub sun_color: Vec4,
     pub camera_pos: Vec3,
@@ -114,7 +110,6 @@ pub fn update_toon_shader(
             toon_mat.camera_pos = cam_t.translation;
         }
         if let Ok((sun_t, dir_light)) = sun.get_single() {
-            toon_mat.sun_pos = sun_t.translation;
             toon_mat.sun_dir = sun_t.back();
             toon_mat.sun_color = dir_light.color;
         }

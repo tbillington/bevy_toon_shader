@@ -8,27 +8,38 @@ use bevy_toon_shader::{ToonShaderMainCamera, ToonShaderMaterial, ToonShaderPlugi
 
 fn main() {
     App::new()
-        .add_plugins(DefaultPlugins)
+        .add_plugins(
+            DefaultPlugins
+                .set(ImagePlugin::default_nearest())
+                .set(WindowPlugin {
+                    primary_window: Some(Window {
+                        title: "Bevy Toon Shader".to_owned(),
+                        ..default()
+                    }),
+                    ..default()
+                }),
+        )
         .add_plugin(ToonShaderPlugin)
         .add_plugin(EguiPlugin)
         .add_startup_system(setup)
-        .add_systems((ui_example_system, close_on_esc))
+        .add_systems((ui_example_system, rotate_shapes, close_on_esc))
         .run();
 }
 
 fn setup(
     mut commands: Commands,
     mut meshes: ResMut<Assets<Mesh>>,
-    // mut materials: ResMut<Assets<CustomMaterial>>,
+    mut images: ResMut<Assets<Image>>,
     mut toon_materials: ResMut<Assets<ToonShaderMaterial>>,
+    mut materials: ResMut<Assets<StandardMaterial>>,
 ) {
     commands.spawn((
         Camera3dBundle {
             camera: Camera {
-                // hdr: true, // 1. HDR is required for bloom
+                hdr: true,
                 ..default()
             },
-            transform: Transform::from_xyz(0.0, 6., 12.0)
+            transform: Transform::from_xyz(0.0, 8., 12.0)
                 .looking_at(Vec3::new(0., 1., 0.), Vec3::Y),
             ..default()
         },
@@ -44,7 +55,7 @@ fn setup(
             },
             transform: Transform {
                 translation: Vec3::new(2.0, 2.0, 2.0),
-                rotation: Quat::from_rotation_x(-PI / 4.),
+                rotation: Quat::from_euler(EulerRot::XYZ, -PI / 4., PI / 6., 0.),
                 ..default()
             },
             ..default()
@@ -53,30 +64,78 @@ fn setup(
     ));
 
     commands.insert_resource(AmbientLight {
-        color: Color::RED * 0.25,
+        color: Color::GRAY * 0.2,
         brightness: 0.10,
     });
 
-    commands.spawn(MaterialMeshBundle {
-        mesh: meshes.add(Mesh::try_from(shape::Icosphere::default()).unwrap()),
-        transform: Transform::from_xyz(0.0, 2.5, 0.0),
-        material: toon_materials.add(ToonShaderMaterial {
-            base_color_texture: None,
-            color: Color::RED,
-            // flags: 256,
-            sun_pos: Vec3::new(0.0, 2.5, 0.0) + Vec3::ONE,
-            sun_dir: Vec3::ZERO,
-            sun_color: Color::WHITE,
-            camera_pos: Vec3::new(0.0, 6., 12.0),
-            // is_red: true,
-            ambient_color: Color::WHITE,
-        }),
-        // material: materials.add(CustomMaterial {
-        //     color: Color::BLUE,
-        //     // flags: 256,
-        //     sun_pos: vec3(0.0, 2.5, 0.0) + Vec3::ONE,
-        //     // is_red: true,
-        // }),
+    let toon_material_textured = toon_materials.add(ToonShaderMaterial {
+        base_color_texture: Some(images.add(uv_debug_texture())),
+        color: Color::WHITE,
+        sun_dir: Vec3::ZERO,
+        sun_color: Color::WHITE,
+        camera_pos: Vec3::new(0.0, 6., 12.0),
+        ambient_color: Color::WHITE,
+    });
+
+    let toon_material = toon_materials.add(ToonShaderMaterial {
+        base_color_texture: None,
+        color: Color::WHITE,
+        sun_dir: Vec3::ZERO,
+        sun_color: Color::WHITE,
+        camera_pos: Vec3::new(0.0, 6., 12.0),
+        ambient_color: Color::WHITE,
+    });
+
+    let shapes = [
+        meshes.add(shape::Cube::default().into()),
+        meshes.add(shape::Box::default().into()),
+        meshes.add(shape::Capsule::default().into()),
+        meshes.add(shape::Torus::default().into()),
+        meshes.add(shape::Cylinder::default().into()),
+        meshes.add(shape::Icosphere::default().try_into().unwrap()),
+        meshes.add(shape::UVSphere::default().into()),
+    ];
+
+    let num_shapes = shapes.len();
+    const X_EXTENT: f32 = 14.5;
+
+    for (i, mesh) in shapes.into_iter().enumerate() {
+        // Texture
+        commands.spawn((
+            MaterialMeshBundle {
+                mesh: mesh.clone(),
+                material: toon_material_textured.clone(),
+                transform: Transform::from_xyz(
+                    -X_EXTENT / 2. + i as f32 / (num_shapes - 1) as f32 * X_EXTENT,
+                    2.0,
+                    3.0,
+                )
+                .with_rotation(Quat::from_rotation_x(-PI / 4.)),
+                ..default()
+            },
+            Shape,
+        ));
+
+        // Without Texture
+        commands.spawn((
+            MaterialMeshBundle {
+                mesh,
+                material: toon_material.clone(),
+                transform: Transform::from_xyz(
+                    -X_EXTENT / 2. + i as f32 / (num_shapes - 1) as f32 * X_EXTENT,
+                    2.0,
+                    -3.0,
+                )
+                .with_rotation(Quat::from_rotation_x(-PI / 4.)),
+                ..default()
+            },
+            Shape,
+        ));
+    }
+
+    commands.spawn(PbrBundle {
+        mesh: meshes.add(shape::Plane::from_size(50.0).into()),
+        material: materials.add(Color::SILVER.into()),
         ..default()
     });
 }
@@ -85,13 +144,15 @@ fn ui_example_system(
     mut contexts: EguiContexts,
     mut ambient_light: Option<ResMut<AmbientLight>>,
     mut controls: ParamSet<(
+        // Camera position
         Query<&Transform, With<ToonShaderMainCamera>>,
+        // Sun position
         Query<(&mut Transform, &DirectionalLight), With<ToonShaderSun>>,
     )>,
 ) {
     egui::Window::new("Controls").show(contexts.ctx_mut(), |ui| {
         if let Some(ambient_light) = ambient_light.as_mut() {
-            ui.label("Color: ");
+            ui.heading("Ambient Light");
             let mut orig = ambient_light.color.as_rgba_f32();
             if ui.color_edit_button_rgba_unmultiplied(&mut orig).changed() {
                 ambient_light.color = Color::from(orig);
@@ -99,8 +160,9 @@ fn ui_example_system(
         }
 
         if let Ok((mut t, _)) = controls.p1().get_single_mut() {
+            ui.heading("Sun");
             ui.horizontal(|ui| {
-                ui.label("Dir: ");
+                ui.label("Angle");
 
                 let (mut x, mut y, z) = t.rotation.to_euler(EulerRot::XYZ);
                 x = x.to_degrees();
@@ -111,4 +173,41 @@ fn ui_example_system(
             });
         }
     });
+}
+
+#[derive(Component)]
+struct Shape;
+
+fn rotate_shapes(mut query: Query<&mut Transform, With<Shape>>, time: Res<Time>) {
+    for mut transform in &mut query {
+        transform.rotate_y(time.delta_seconds() / 2.);
+    }
+}
+
+// Copied from bevy 3d shapes example https://github.com/bevyengine/bevy/blob/1c5c94715cb17cda5ae209eef12a938501de90b5/examples/3d/3d_shapes.rs#L96
+fn uv_debug_texture() -> Image {
+    const TEXTURE_SIZE: usize = 8;
+
+    let mut palette: [u8; 32] = [
+        255, 102, 159, 255, 255, 159, 102, 255, 236, 255, 102, 255, 121, 255, 102, 255, 102, 255,
+        198, 255, 102, 198, 255, 255, 121, 102, 255, 255, 236, 102, 255, 255,
+    ];
+
+    let mut texture_data = [0; TEXTURE_SIZE * TEXTURE_SIZE * 4];
+    for y in 0..TEXTURE_SIZE {
+        let offset = TEXTURE_SIZE * y * 4;
+        texture_data[offset..(offset + TEXTURE_SIZE * 4)].copy_from_slice(&palette);
+        palette.rotate_right(4);
+    }
+
+    Image::new_fill(
+        bevy::render::render_resource::Extent3d {
+            width: TEXTURE_SIZE as u32,
+            height: TEXTURE_SIZE as u32,
+            depth_or_array_layers: 1,
+        },
+        bevy::render::render_resource::TextureDimension::D2,
+        &texture_data,
+        bevy::render::render_resource::TextureFormat::Rgba8UnormSrgb,
+    )
 }
