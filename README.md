@@ -60,14 +60,7 @@ fn setup(
         ..default()
     });
 
-    let material = toon_materials.add(ToonShaderMaterial {
-        base_color_texture: None,
-        color: Color::WHITE,
-        sun_dir: Vec3::ZERO,
-        sun_color: Color::WHITE,
-        camera_pos: Vec3::new(0.0, 6., 12.0),
-        ambient_color: Color::WHITE,
-    });
+    let material = toon_materials.add(ToonShaderMaterial::default());
 
     // 3D object
     commands.spawn(MaterialMeshBundle {

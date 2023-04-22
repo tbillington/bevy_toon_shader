@@ -70,21 +70,10 @@ fn setup(
 
     let toon_material_textured = toon_materials.add(ToonShaderMaterial {
         base_color_texture: Some(images.add(uv_debug_texture())),
-        color: Color::WHITE,
-        sun_dir: Vec3::ZERO,
-        sun_color: Color::WHITE,
-        camera_pos: Vec3::new(0.0, 6., 12.0),
-        ambient_color: Color::WHITE,
+        ..default()
     });
 
-    let toon_material = toon_materials.add(ToonShaderMaterial {
-        base_color_texture: None,
-        color: Color::WHITE,
-        sun_dir: Vec3::ZERO,
-        sun_color: Color::WHITE,
-        camera_pos: Vec3::new(0.0, 6., 12.0),
-        ambient_color: Color::WHITE,
-    });
+    let toon_material = toon_materials.add(ToonShaderMaterial::default());
 
     let shapes = [
         meshes.add(shape::Cube::default().into()),
