@@ -22,7 +22,6 @@ fn fragment (in: FragmentInput) -> @location(0) vec4<f32> {
     let base_color = material.color * textureSample(base_color_texture, base_color_sampler, in.uv);
     let normal = normalize(in.world_normal);
     let n_dot_l = dot(material.sun_dir, normal);
-    // let light_intensity = smoothstep(0.0, 0.01, n_dot_l);
     var light_intensity = 0.0;
 
     if n_dot_l > 0.0 {
@@ -32,11 +31,6 @@ fn fragment (in: FragmentInput) -> @location(0) vec4<f32> {
         x = round(x);
 
         light_intensity = x / bands;
-
-        // Extra fake specular
-        // if n_dot_l > 0.99 {
-        //     light_intensity *= 150.0;
-        // }
     } else {
         light_intensity = 0.0;
     }
