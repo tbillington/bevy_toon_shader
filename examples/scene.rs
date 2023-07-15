@@ -19,10 +19,10 @@ fn main() {
                     ..default()
                 }),
         )
-        .add_plugin(ToonShaderPlugin)
-        .add_plugin(EguiPlugin)
-        .add_startup_system(setup)
-        .add_systems((ui_example_system, rotate_shapes, close_on_esc))
+        .add_plugins(ToonShaderPlugin)
+        .add_plugins(EguiPlugin)
+        .add_systems(Startup, setup)
+        .add_systems(Update, (ui_example_system, rotate_shapes, close_on_esc))
         .run();
 }
 
