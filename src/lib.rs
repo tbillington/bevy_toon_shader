@@ -2,7 +2,7 @@ use bevy::{
     asset::load_internal_asset,
     pbr::{MaterialPipeline, MaterialPipelineKey},
     prelude::*,
-    reflect::TypeUuid,
+    reflect::{TypePath, TypeUuid},
     render::{
         mesh::MeshVertexBufferLayout,
         render_resource::{
@@ -27,12 +27,12 @@ impl Plugin for ToonShaderPlugin {
             Shader::from_wgsl
         );
 
-        app.add_plugin(MaterialPlugin::<ToonShaderMaterial>::default())
-            .add_system(update_toon_shader);
+        app.add_plugins(MaterialPlugin::<ToonShaderMaterial>::default())
+            .add_systems(Update, update_toon_shader);
     }
 }
 
-#[derive(AsBindGroup, TypeUuid, Debug, Clone, Default)]
+#[derive(AsBindGroup, TypeUuid, TypePath, Debug, Clone, Default)]
 #[uuid = "7b033895-875f-4cb5-97ae-8601fcc37053"]
 #[uniform(0, ToonShaderMaterialUniform)]
 pub struct ToonShaderMaterial {
@@ -106,7 +106,7 @@ pub fn update_toon_shader(
     ambient_light: Option<Res<AmbientLight>>,
     mut toon_materials: ResMut<Assets<ToonShaderMaterial>>,
 ) {
-    for (_, mut toon_mat) in toon_materials.iter_mut() {
+    for (_, toon_mat) in toon_materials.iter_mut() {
         if let Ok(cam_t) = main_cam.get_single() {
             toon_mat.camera_pos = cam_t.translation;
         }
