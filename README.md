@@ -33,7 +33,7 @@ fn main() {
     App::new()
         .add_plugins(DefaultPlugins)
         .add_plugin(ToonShaderPlugin)
-        .add_startup_system(setup)
+        .add_systems(Startup, setup)
         .run();
 }
 
@@ -84,6 +84,7 @@ cargo run --example scene
 
 | bevy | bevy_toon_shader |
 | -- | -- |
+| 0.11 | 0.2 |
 | 0.10 | 0.1 |
 
 ## Credit
