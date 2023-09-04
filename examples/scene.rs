@@ -65,7 +65,7 @@ fn setup(
 
     commands.insert_resource(AmbientLight {
         color: Color::GRAY * 0.2,
-        brightness: 0.10,
+        brightness: 0.50,
     });
 
     let toon_material_textured = toon_materials.add(ToonShaderMaterial {
@@ -104,6 +104,42 @@ fn setup(
             },
             Shape,
         ));
+
+        // Texture
+        commands.spawn((
+            MaterialMeshBundle {
+                mesh: mesh.clone(),
+                material: toon_material_textured.clone(),
+                transform: Transform::from_xyz(
+                    -X_EXTENT / 2. + i as f32 / (num_shapes - 1) as f32 * X_EXTENT,
+                    4.0,
+                    3.0,
+                )
+                .with_rotation(Quat::from_rotation_x(-PI / 4.)),
+                ..default()
+            },
+            Shape,
+        ));
+
+        // Texture
+        // commands.spawn((
+        //     PbrBundle {
+        //         mesh: mesh.clone(),
+        //         material: toon_material_textured.clone(),
+        //         // material: materials.add(StandardMaterial {
+        //         //     base_color_texture: Some(images.add(uv_debug_texture())),
+        //         //     ..default()
+        //         // }),
+        //         transform: Transform::from_xyz(
+        //             -X_EXTENT / 2. + i as f32 / (num_shapes - 1) as f32 * X_EXTENT,
+        //             2.0,
+        //             5.0,
+        //         )
+        //         .with_rotation(Quat::from_rotation_x(-PI / 4.)),
+        //         ..default()
+        //     },
+        //     Shape,
+        // ));
 
         // Without Texture
         commands.spawn((

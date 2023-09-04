@@ -10,13 +10,21 @@ description = "Toon shader for the Bevy game engine"
 repository = "https://github.com/tbillington/bevy_toon_shader"
 homepage = "https://github.com/tbillington/bevy_toon_shader"
 
+[workspace.dependencies]
+bevy = { version = "0.11", default-features = false }
+
+
 [dependencies]
-bevy = { version = "0.11", default-features = false, features = [
+bevy = { workspace = true, default-features = false, features = [
   "bevy_pbr",
   "bevy_render",
   "bevy_asset",
 ] }
 
 [dev-dependencies]
-bevy = { version = "0.11" }
+bevy = { workspace = true, default-features = true }
 bevy_egui = "0.21.0"
+
+# [[example]]
+# name = "scene"
+# path = "examples/scene/src/main.rs"
