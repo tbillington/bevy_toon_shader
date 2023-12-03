@@ -11,9 +11,7 @@ use bevy::{
         },
     },
 };
-
-pub const TOON_SHADER_HANDLE: HandleUntyped =
-    HandleUntyped::weak_from_u64(Shader::TYPE_UUID, 11079857277321826659);
+pub const TOON_SHADER_HANDLE: Handle<Shader> = Handle::weak_from_u128(11079857277321826659);
 
 #[derive(Default)]
 pub struct ToonShaderPlugin;
@@ -32,7 +30,7 @@ impl Plugin for ToonShaderPlugin {
     }
 }
 
-#[derive(AsBindGroup, TypeUuid, TypePath, Debug, Clone, Default)]
+#[derive(Asset, AsBindGroup, TypeUuid, TypePath, Debug, Clone, Default)]
 #[uuid = "7b033895-875f-4cb5-97ae-8601fcc37053"]
 #[uniform(0, ToonShaderMaterialUniform)]
 pub struct ToonShaderMaterial {
@@ -48,7 +46,7 @@ pub struct ToonShaderMaterial {
 
 impl Material for ToonShaderMaterial {
     fn fragment_shader() -> ShaderRef {
-        TOON_SHADER_HANDLE.typed().into()
+        TOON_SHADER_HANDLE.into()
     }
 
     fn specialize(

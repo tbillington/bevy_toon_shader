@@ -13,10 +13,10 @@ var base_color_texture: texture_2d<f32>;
 @group(1) @binding(2)
 var base_color_sampler: sampler;
 
-#import bevy_pbr::mesh_vertex_output MeshVertexOutput
+#import bevy_pbr::forward_io::VertexOutput
 
 @fragment
-fn fragment (in: MeshVertexOutput) -> @location(0) vec4<f32> {
+fn fragment (in: VertexOutput) -> @location(0) vec4<f32> {
     let base_color = material.color * textureSample(base_color_texture, base_color_sampler, in.uv);
     let normal = normalize(in.world_normal);
     let n_dot_l = dot(material.sun_dir, normal);

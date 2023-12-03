@@ -84,6 +84,7 @@ cargo run --example scene
 
 | bevy | bevy_toon_shader |
 | -- | -- |
+| 0.12 | 0.3 |
 | 0.11 | 0.2 |
 | 0.10 | 0.1 |
 
