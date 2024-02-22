@@ -3,7 +3,7 @@
 use std::f32::consts::PI;
 
 use bevy::{prelude::*, window::close_on_esc};
-use bevy_egui::{egui, EguiContexts, EguiPlugin};
+// use bevy_egui::{egui, EguiContexts, EguiPlugin};
 use bevy_toon_shader::{ToonShaderMainCamera, ToonShaderMaterial, ToonShaderPlugin, ToonShaderSun};
 
 fn main() {
@@ -20,9 +20,16 @@ fn main() {
                 }),
         )
         .add_plugins(ToonShaderPlugin)
-        .add_plugins(EguiPlugin)
+        // .add_plugins(EguiPlugin)
         .add_systems(Startup, setup)
-        .add_systems(Update, (ui_example_system, rotate_shapes, close_on_esc))
+        .add_systems(
+            Update,
+            (
+                // ui_example_system,
+                rotate_shapes,
+                close_on_esc,
+            ),
+        )
         .run();
 }
 
@@ -76,13 +83,12 @@ fn setup(
     let toon_material = toon_materials.add(ToonShaderMaterial::default());
 
     let shapes = [
-        meshes.add(shape::Cube::default().into()),
-        meshes.add(shape::Box::default().into()),
-        meshes.add(shape::Capsule::default().into()),
-        meshes.add(shape::Torus::default().into()),
-        meshes.add(shape::Cylinder::default().into()),
-        meshes.add(shape::Icosphere::default().try_into().unwrap()),
-        meshes.add(shape::UVSphere::default().into()),
+        meshes.add(Cuboid::default()),
+        meshes.add(Capsule3d::default()),
+        meshes.add(Torus::default()),
+        meshes.add(Cylinder::default()),
+        meshes.add(Sphere::default().mesh().ico(5).unwrap()),
+        meshes.add(Sphere::default().mesh().uv(32, 18)),
     ];
 
     let num_shapes = shapes.len();
@@ -123,46 +129,46 @@ fn setup(
     }
 
     commands.spawn(PbrBundle {
-        mesh: meshes.add(shape::Plane::from_size(50.0).into()),
-        material: materials.add(Color::SILVER.into()),
+        mesh: meshes.add(Plane3d::default().mesh().size(50.0, 50.0)),
+        material: materials.add(Color::SILVER),
         ..default()
     });
 }
 
-fn ui_example_system(
-    mut contexts: EguiContexts,
-    mut ambient_light: Option<ResMut<AmbientLight>>,
-    mut controls: ParamSet<(
-        // Camera position
-        Query<&Transform, With<ToonShaderMainCamera>>,
-        // Sun position
-        Query<(&mut Transform, &DirectionalLight), With<ToonShaderSun>>,
-    )>,
-) {
-    egui::Window::new("Controls").show(contexts.ctx_mut(), |ui| {
-        if let Some(ambient_light) = ambient_light.as_mut() {
-            ui.heading("Ambient Light");
-            let mut orig = ambient_light.color.as_rgba_f32();
-            if ui.color_edit_button_rgba_unmultiplied(&mut orig).changed() {
-                ambient_light.color = Color::from(orig);
-            }
-        }
+// fn ui_example_system(
+//     mut contexts: EguiContexts,
+//     mut ambient_light: Option<ResMut<AmbientLight>>,
+//     mut controls: ParamSet<(
+//         // Camera position
+//         Query<&Transform, With<ToonShaderMainCamera>>,
+//         // Sun position
+//         Query<(&mut Transform, &DirectionalLight), With<ToonShaderSun>>,
+//     )>,
+// ) {
+//     egui::Window::new("Controls").show(contexts.ctx_mut(), |ui| {
+//         if let Some(ambient_light) = ambient_light.as_mut() {
+//             ui.heading("Ambient Light");
+//             let mut orig = ambient_light.color.as_rgba_f32();
+//             if ui.color_edit_button_rgba_unmultiplied(&mut orig).changed() {
+//                 ambient_light.color = Color::rgba_from_array(orig);
+//             }
+//         }
 
-        if let Ok((mut t, _)) = controls.p1().get_single_mut() {
-            ui.heading("Sun");
-            ui.horizontal(|ui| {
-                ui.label("Angle");
+//         if let Ok((mut t, _)) = controls.p1().get_single_mut() {
+//             ui.heading("Sun");
+//             ui.horizontal(|ui| {
+//                 ui.label("Angle");
 
-                let (mut x, mut y, z) = t.rotation.to_euler(EulerRot::XYZ);
-                x = x.to_degrees();
-                y = y.to_degrees();
-                ui.add(egui::widgets::DragValue::new(&mut x).speed(1.));
-                ui.add(egui::widgets::DragValue::new(&mut y).speed(1.));
-                t.rotation = Quat::from_euler(EulerRot::XYZ, x.to_radians(), y.to_radians(), z);
-            });
-        }
-    });
-}
+//                 let (mut x, mut y, z) = t.rotation.to_euler(EulerRot::XYZ);
+//                 x = x.to_degrees();
+//                 y = y.to_degrees();
+//                 ui.add(egui::widgets::DragValue::new(&mut x).speed(1.));
+//                 ui.add(egui::widgets::DragValue::new(&mut y).speed(1.));
+//                 t.rotation = Quat::from_euler(EulerRot::XYZ, x.to_radians(), y.to_radians(), z);
+//             });
+//         }
+//     });
+// }
 
 #[derive(Component)]
 struct Shape;
@@ -198,5 +204,6 @@ fn uv_debug_texture() -> Image {
         bevy::render::render_resource::TextureDimension::D2,
         &texture_data,
         bevy::render::render_resource::TextureFormat::Rgba8UnormSrgb,
+        bevy::render::render_asset::RenderAssetUsages::default(),
     )
 }
