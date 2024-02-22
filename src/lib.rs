@@ -2,7 +2,7 @@ use bevy::{
     asset::load_internal_asset,
     pbr::{MaterialPipeline, MaterialPipelineKey},
     prelude::*,
-    reflect::{TypePath, TypeUuid},
+    reflect::TypePath,
     render::{
         mesh::MeshVertexBufferLayout,
         render_resource::{
@@ -30,8 +30,9 @@ impl Plugin for ToonShaderPlugin {
     }
 }
 
-#[derive(Asset, AsBindGroup, TypeUuid, TypePath, Debug, Clone, Default)]
-#[uuid = "7b033895-875f-4cb5-97ae-8601fcc37053"]
+#[derive(Asset, AsBindGroup, TypePath, Debug, Clone, Default)]
+// #[uuid = "7b033895-875f-4cb5-97ae-8601fcc37053"]
+#[type_path = "bevy_toon_shader::ToonShaderMaterial"]
 #[uniform(0, ToonShaderMaterialUniform)]
 pub struct ToonShaderMaterial {
     pub color: Color,
@@ -65,11 +66,11 @@ impl AsBindGroupShaderType<ToonShaderMaterialUniform> for ToonShaderMaterial {
         _images: &bevy::render::render_asset::RenderAssets<Image>,
     ) -> ToonShaderMaterialUniform {
         ToonShaderMaterialUniform {
-            color: self.color.into(),
+            color: self.color.rgba_to_vec4(),
             sun_dir: self.sun_dir,
-            sun_color: self.sun_color.into(),
+            sun_color: self.sun_color.rgba_to_vec4(),
             camera_pos: self.camera_pos,
-            ambient_color: self.ambient_color.into(),
+            ambient_color: self.ambient_color.rgba_to_vec4(),
         }
     }
 }
@@ -109,7 +110,7 @@ pub fn update_toon_shader(
             toon_mat.camera_pos = cam_t.translation;
         }
         if let Ok((sun_t, dir_light)) = sun.get_single() {
-            toon_mat.sun_dir = sun_t.back();
+            toon_mat.sun_dir = sun_t.back().into();
             toon_mat.sun_color = dir_light.color;
         }
         if let Some(light) = &ambient_light {
