@@ -2,13 +2,10 @@ use bevy::{
     asset::load_internal_asset,
     pbr::{MaterialPipeline, MaterialPipelineKey},
     prelude::*,
-    reflect::{TypePath},
-    render::{
-        mesh::MeshVertexBufferLayout,
-        render_resource::{
-            AsBindGroup, AsBindGroupShaderType, RenderPipelineDescriptor, ShaderRef, ShaderType,
-            SpecializedMeshPipelineError,
-        },
+    reflect::TypePath,
+    render::render_resource::{
+        AsBindGroup, AsBindGroupShaderType, RenderPipelineDescriptor, ShaderRef, ShaderType,
+        SpecializedMeshPipelineError,
     },
 };
 pub const TOON_SHADER_HANDLE: Handle<Shader> = Handle::weak_from_u128(11079857277321826659);
@@ -49,32 +46,27 @@ impl Material for ToonShaderMaterial {
         TOON_SHADER_HANDLE.into()
     }
     fn specialize(
-            pipeline: &MaterialPipeline<Self>,
-            descriptor: &mut RenderPipelineDescriptor,
-            layout: &bevy::render::mesh::MeshVertexBufferLayoutRef,
-            key: MaterialPipelineKey<Self>,
-        ) -> Result<(), SpecializedMeshPipelineError> {
-            Ok(())
+        _pipeline: &MaterialPipeline<Self>,
+        _descriptor: &mut RenderPipelineDescriptor,
+        _layout: &bevy::render::mesh::MeshVertexBufferLayoutRef,
+        _key: MaterialPipelineKey<Self>,
+    ) -> Result<(), SpecializedMeshPipelineError> {
+        Ok(())
     }
-    // fn specialize(
-    //     _pipeline: &MaterialPipeline<Self>,
-    //     _descriptor: &mut RenderPipelineDescriptor,
-    //     _layout: &MeshVertexBufferLayout,
-    //     _key: MaterialPipelineKey<Self>,
-    // ) -> Result<(), SpecializedMeshPipelineError> {
-    //     Ok(())
-    // }
 }
 
 impl AsBindGroupShaderType<ToonShaderMaterialUniform> for ToonShaderMaterial {
-    fn as_bind_group_shader_type(&self, images: &bevy::render::render_asset::RenderAssets<bevy::render::texture::GpuImage>) -> ToonShaderMaterialUniform {
-            ToonShaderMaterialUniform {
-                color: self.color.into(),
-                sun_dir: self.sun_dir,
-                sun_color: self.sun_color.into(),
-                camera_pos: self.camera_pos,
-                ambient_color: self.ambient_color.into(),
-            }
+    fn as_bind_group_shader_type(
+        &self,
+        _images: &bevy::render::render_asset::RenderAssets<bevy::render::texture::GpuImage>,
+    ) -> ToonShaderMaterialUniform {
+        ToonShaderMaterialUniform {
+            color: self.color.into(),
+            sun_dir: self.sun_dir,
+            sun_color: self.sun_color.into(),
+            camera_pos: self.camera_pos,
+            ambient_color: self.ambient_color.into(),
+        }
     }
 }
 

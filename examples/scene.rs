@@ -123,8 +123,11 @@ fn setup(
     }
 
     commands.spawn(PbrBundle {
-        mesh: meshes.add(Plane3d::new(Vec3::new(0.0,1.0, 0.0), Vec2::new(50.0, 50.0) )),
-        material: materials.add(Color::LinearRgba(LinearRgba::new(0.75,  0.75, 0.75, 1.0 ))),
+        mesh: meshes.add(Plane3d::new(
+            Vec3::new(0.0, 1.0, 0.0),
+            Vec2::new(50.0, 50.0),
+        )),
+        material: materials.add(Color::LinearRgba(LinearRgba::new(0.75, 0.75, 0.75, 1.0))),
         ..default()
     });
 }
@@ -144,7 +147,8 @@ fn ui_example_system(
             ui.heading("Ambient Light");
             let mut orig = ambient_light.color.to_linear().to_f32_array();
             if ui.color_edit_button_rgba_unmultiplied(&mut orig).changed() {
-                ambient_light.color = bevy::prelude::Color::LinearRgba(LinearRgba::from_f32_array(orig));
+                ambient_light.color =
+                    bevy::prelude::Color::LinearRgba(LinearRgba::from_f32_array(orig));
             }
         }
 
@@ -214,6 +218,6 @@ fn uv_debug_texture() -> Image {
         bevy::render::render_resource::TextureDimension::D2,
         &texture_data,
         bevy::render::render_resource::TextureFormat::Rgba8UnormSrgb,
-        RenderAssetUsages::default()
+        RenderAssetUsages::default(),
     )
 }
