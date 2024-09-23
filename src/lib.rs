@@ -2,7 +2,6 @@ use bevy::{
     asset::load_internal_asset,
     pbr::{MaterialPipeline, MaterialPipelineKey},
     prelude::*,
-    reflect::TypePath,
     render::render_resource::{
         AsBindGroup, AsBindGroupShaderType, RenderPipelineDescriptor, ShaderRef, ShaderType,
         SpecializedMeshPipelineError,
@@ -21,15 +20,19 @@ impl Plugin for ToonShaderPlugin {
             "toon_shader.wgsl",
             Shader::from_wgsl
         );
-
-        app.add_plugins(MaterialPlugin::<ToonShaderMaterial>::default())
+    
+        app
+        //.register_type::<ToonShaderMaterial>()
+        .register_asset_reflect::<ToonShaderMaterial>()
+        .add_plugins(MaterialPlugin::<ToonShaderMaterial>::default())
             .add_systems(Update, update_toon_shader);
     }
 }
 
-#[derive(Asset, AsBindGroup, TypePath, Debug, Clone, Default)]
+#[derive(Asset, AsBindGroup, Reflect, Debug, Clone, Default)]
 // #[uuid = "7b033895-875f-4cb5-97ae-8601fcc37053"]
 #[uniform(0, ToonShaderMaterialUniform)]
+#[reflect(Default, Debug)]
 pub struct ToonShaderMaterial {
     pub color: Color,
     pub sun_dir: Vec3,
