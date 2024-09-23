@@ -2,7 +2,7 @@
 
 use std::f32::consts::PI;
 
-use bevy::{prelude::*, window::close_on_esc};
+use bevy::{prelude::*, render::render_asset::RenderAssetUsages};
 use bevy_egui::{egui, EguiContexts, EguiPlugin};
 use bevy_toon_shader::{ToonShaderMainCamera, ToonShaderMaterial, ToonShaderPlugin, ToonShaderSun};
 
@@ -64,7 +64,7 @@ fn setup(
     ));
 
     commands.insert_resource(AmbientLight {
-        color: Color::GRAY * 0.2,
+        color: Color::linear_rgb(0.5 * 0.2, 0.5 * 0.2, 0.5 * 0.2),
         brightness: 0.10,
     });
 
@@ -76,13 +76,13 @@ fn setup(
     let toon_material = toon_materials.add(ToonShaderMaterial::default());
 
     let shapes = [
-        meshes.add(shape::Cube::default().into()),
-        meshes.add(shape::Box::default().into()),
-        meshes.add(shape::Capsule::default().into()),
-        meshes.add(shape::Torus::default().into()),
-        meshes.add(shape::Cylinder::default().into()),
-        meshes.add(shape::Icosphere::default().try_into().unwrap()),
-        meshes.add(shape::UVSphere::default().into()),
+        meshes.add(Cuboid::default()),
+        meshes.add(Cuboid::new(1.0, 2.0, 1.0)),
+        meshes.add(Capsule3d::default()),
+        meshes.add(Torus::new(0.5, 1.5)),
+        meshes.add(Cylinder::default()),
+        meshes.add(Sphere::default()),
+        meshes.add(Sphere::default()),
     ];
 
     let num_shapes = shapes.len();
@@ -123,8 +123,11 @@ fn setup(
     }
 
     commands.spawn(PbrBundle {
-        mesh: meshes.add(shape::Plane::from_size(50.0).into()),
-        material: materials.add(Color::SILVER.into()),
+        mesh: meshes.add(Plane3d::new(
+            Vec3::new(0.0, 1.0, 0.0),
+            Vec2::new(50.0, 50.0),
+        )),
+        material: materials.add(Color::LinearRgba(LinearRgba::new(0.75, 0.75, 0.75, 1.0))),
         ..default()
     });
 }
@@ -142,9 +145,10 @@ fn ui_example_system(
     egui::Window::new("Controls").show(contexts.ctx_mut(), |ui| {
         if let Some(ambient_light) = ambient_light.as_mut() {
             ui.heading("Ambient Light");
-            let mut orig = ambient_light.color.as_rgba_f32();
+            let mut orig = ambient_light.color.to_linear().to_f32_array();
             if ui.color_edit_button_rgba_unmultiplied(&mut orig).changed() {
-                ambient_light.color = Color::from(orig);
+                ambient_light.color =
+                    bevy::prelude::Color::LinearRgba(LinearRgba::from_f32_array(orig));
             }
         }
 
@@ -162,6 +166,22 @@ fn ui_example_system(
             });
         }
     });
+}
+
+pub fn close_on_esc(
+    mut commands: Commands,
+    focused_windows: Query<(Entity, &Window)>,
+    input: Res<ButtonInput<KeyCode>>,
+) {
+    for (window, focus) in focused_windows.iter() {
+        if !focus.focused {
+            continue;
+        }
+
+        if input.just_pressed(KeyCode::Escape) {
+            commands.entity(window).despawn();
+        }
+    }
 }
 
 #[derive(Component)]
@@ -198,5 +218,6 @@ fn uv_debug_texture() -> Image {
         bevy::render::render_resource::TextureDimension::D2,
         &texture_data,
         bevy::render::render_resource::TextureFormat::Rgba8UnormSrgb,
+        RenderAssetUsages::default(),
     )
 }

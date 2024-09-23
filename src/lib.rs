@@ -2,13 +2,9 @@ use bevy::{
     asset::load_internal_asset,
     pbr::{MaterialPipeline, MaterialPipelineKey},
     prelude::*,
-    reflect::{TypePath, TypeUuid},
-    render::{
-        mesh::MeshVertexBufferLayout,
-        render_resource::{
-            AsBindGroup, AsBindGroupShaderType, RenderPipelineDescriptor, ShaderRef, ShaderType,
-            SpecializedMeshPipelineError,
-        },
+    render::render_resource::{
+        AsBindGroup, AsBindGroupShaderType, RenderPipelineDescriptor, ShaderRef, ShaderType,
+        SpecializedMeshPipelineError,
     },
 };
 pub const TOON_SHADER_HANDLE: Handle<Shader> = Handle::weak_from_u128(11079857277321826659);
@@ -24,15 +20,15 @@ impl Plugin for ToonShaderPlugin {
             "toon_shader.wgsl",
             Shader::from_wgsl
         );
-
-        app.add_plugins(MaterialPlugin::<ToonShaderMaterial>::default())
+        app.register_asset_reflect::<ToonShaderMaterial>()
+            .add_plugins(MaterialPlugin::<ToonShaderMaterial>::default())
             .add_systems(Update, update_toon_shader);
     }
 }
 
-#[derive(Asset, AsBindGroup, TypeUuid, TypePath, Debug, Clone, Default)]
-#[uuid = "7b033895-875f-4cb5-97ae-8601fcc37053"]
+#[derive(Asset, AsBindGroup, Reflect, Debug, Clone, Default)]
 #[uniform(0, ToonShaderMaterialUniform)]
+#[reflect(Default, Debug)]
 pub struct ToonShaderMaterial {
     pub color: Color,
     pub sun_dir: Vec3,
@@ -48,11 +44,10 @@ impl Material for ToonShaderMaterial {
     fn fragment_shader() -> ShaderRef {
         TOON_SHADER_HANDLE.into()
     }
-
     fn specialize(
         _pipeline: &MaterialPipeline<Self>,
         _descriptor: &mut RenderPipelineDescriptor,
-        _layout: &MeshVertexBufferLayout,
+        _layout: &bevy::render::mesh::MeshVertexBufferLayoutRef,
         _key: MaterialPipelineKey<Self>,
     ) -> Result<(), SpecializedMeshPipelineError> {
         Ok(())
@@ -62,7 +57,7 @@ impl Material for ToonShaderMaterial {
 impl AsBindGroupShaderType<ToonShaderMaterialUniform> for ToonShaderMaterial {
     fn as_bind_group_shader_type(
         &self,
-        _images: &bevy::render::render_asset::RenderAssets<Image>,
+        _images: &bevy::render::render_asset::RenderAssets<bevy::render::texture::GpuImage>,
     ) -> ToonShaderMaterialUniform {
         ToonShaderMaterialUniform {
             color: self.color.into(),
@@ -76,11 +71,11 @@ impl AsBindGroupShaderType<ToonShaderMaterialUniform> for ToonShaderMaterial {
 
 #[derive(Clone, Default, ShaderType)]
 pub struct ToonShaderMaterialUniform {
-    pub color: Vec4,
+    pub color: LinearRgba,
     pub sun_dir: Vec3,
-    pub sun_color: Vec4,
+    pub sun_color: LinearRgba,
     pub camera_pos: Vec3,
-    pub ambient_color: Vec4,
+    pub ambient_color: LinearRgba,
 }
 
 // #[derive(Eq, PartialEq, Hash, Clone)]
@@ -109,7 +104,7 @@ pub fn update_toon_shader(
             toon_mat.camera_pos = cam_t.translation;
         }
         if let Ok((sun_t, dir_light)) = sun.get_single() {
-            toon_mat.sun_dir = sun_t.back();
+            toon_mat.sun_dir = *sun_t.back();
             toon_mat.sun_color = dir_light.color;
         }
         if let Some(light) = &ambient_light {

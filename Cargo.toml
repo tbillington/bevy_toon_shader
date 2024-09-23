@@ -11,12 +11,13 @@ repository = "https://github.com/tbillington/bevy_toon_shader"
 homepage = "https://github.com/tbillington/bevy_toon_shader"
 
 [dependencies]
-bevy = { version = "0.12", default-features = false, features = [
+bevy = { version = "0.14", default-features = false, features = [
   "bevy_pbr",
   "bevy_render",
   "bevy_asset",
 ] }
 
 [dev-dependencies]
-bevy = "0.12"
-bevy_egui = "0.23.0"
+bevy = "0.14"
+bevy_egui = "0.29.0"
+
