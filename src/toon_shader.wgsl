@@ -17,14 +17,7 @@ var base_color_sampler: sampler;
 
 @fragment
 fn fragment (in: VertexOutput) -> @location(0) vec4<f32> {
-    // model may not have uvs for whatever reason. This is to allow it to still render.
-    #ifdef VERTEX_UVS_A
-        let uv = in.uv;
-    #else
-        let uv = 0.0;
-    #endif
-
-    let base_color = material.color * textureSample(base_color_texture, base_color_sampler, uv);    
+    let base_color = material.color * textureSample(base_color_texture, base_color_sampler, in.uv);
     let normal = normalize(in.world_normal);
     let n_dot_l = dot(material.sun_dir, normal);
     var light_intensity = 0.0;
